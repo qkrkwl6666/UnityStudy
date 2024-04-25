@@ -11,7 +11,8 @@ public class LivingEntity : MonoBehaviourPun, IDamageable {
     public event Action onDeath; // 사망시 발동할 이벤트
 
     // 생명체가 활성화될때 상태를 리셋
-    protected virtual void OnEnable() {
+    protected virtual void OnEnable() 
+    {
         // 사망하지 않은 상태로 시작
         dead = false;
         // 체력을 시작 체력으로 초기화
