@@ -6,6 +6,7 @@ public class Gun : MonoBehaviour
 {
     public ParticleSystem gunParticle;
     public Transform firePosition;
+    private int damage = 50;
 
     // ÃÑ¾Ë ±ËÀû
     private LineRenderer lineRenderer;
@@ -28,11 +29,6 @@ public class Gun : MonoBehaviour
         Shot();
     }
 
-    private void FixedUpdate()
-    {
-
-    }
-
     private void Shot()
     {
         if (Input.GetMouseButtonDown(0))
@@ -41,8 +37,14 @@ public class Gun : MonoBehaviour
 
             if (Physics.Raycast(ray , out RaycastHit hit, 100f))
             {
-                Debug.Log("Hit");
                 StartCoroutine(ShotEffect(hit.point));
+
+                if (hit.collider.CompareTag("Enemy"))
+                {
+                    var enemy = hit.collider.gameObject.GetComponent<Enemy>();
+
+                    enemy.OnDamege(damage, hit.point);
+                }
             }
 
         }
