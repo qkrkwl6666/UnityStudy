@@ -28,7 +28,7 @@ MonoBehaviour:
     AuthMode: 0
     EnableLobbyStatistics: 0
     NetworkLogging: 1
-  DevRegion: hk
+  DevRegion: kr
   PunLogging: 0
   EnableSupportLogger: 0
   RunInBackground: 1
@@ -45,13 +45,15 @@ MonoBehaviour:
   - OnRespawn
   - RespawnSpaceship
   - RestoreHealth
+  - ServerOnItem
   - Setup
   - ShotEffectOnClients
   - ShotOnServer
   - Spawn
   - Use
-  - ServerOnItem
   - UseItem
+  - AddAmmo
+  - Die
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

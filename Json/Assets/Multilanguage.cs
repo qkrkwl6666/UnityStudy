@@ -9,8 +9,6 @@ public class Multilanguage : MonoBehaviour
     public string id;
     public List<string> ids = new List<string>();
     private TMPro.TextMeshProUGUI textMeshPro;
-
-
     private void Awake()
     {
         currentLanguages = Languages.KOREAN;

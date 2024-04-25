@@ -91,10 +91,9 @@ public class PlayerHealth : LivingEntity {
     {
         // 아이템과 충돌한 경우 해당 아이템을 사용하는 처리
 
+        if (!photonView.IsMine) return;
         if (other.CompareTag("Item"))
         {
-            if (!photonView.IsMine) return;
-
             var item = other.GetComponent<IItem>();
 
             if (item != null)

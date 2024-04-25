@@ -15,12 +15,21 @@ public static class DataTablesIds
         {"StringTableKR", "StringTableEN", "StringTableJP" };
 
     public static readonly string Item = "ItemTable";
+
+    public static string CurrentString
+    {
+        get { return String[(int)Vars.currentLanguages]; }
+    }
 }
 
 public static class Vars
 {
     public static readonly string Version = "1.0.0";
     public static readonly int BuildVersion = 1;
+
+    public static Languages currentLanguages = Languages.KOREAN;
+
+    public static Languages editorLanguage = Languages.KOREAN;
 }
 
 public static class Tags

@@ -96,9 +96,6 @@ public class EnemySpawner : MonoBehaviourPun, IPunObservable
 
         var enemy = go.GetComponent<Enemy>();
 
-        //enemyCount++;
-        enemies.Add(enemy);
-
         enemy.photonView.RPC("Setup", RpcTarget.All, data.health, data.damage, data.speed, data.skinColor);
 
         enemy.onDeath += () =>
@@ -112,7 +109,13 @@ public class EnemySpawner : MonoBehaviourPun, IPunObservable
             {
                 GameManager.instance.GetComponent<ItemSpawner>().Spawn(enemy.transform);
             }
+            UIManager.instance.UpdateWaveText(wave, enemyCount);
         };
+
+        enemyCount++;
+        enemies.Add(enemy);
+
+        UIManager.instance.UpdateWaveText(wave, enemyCount);
     }
 
     // 적을 생성하고 생성한 적에게 추적할 대상을 할당
@@ -139,11 +142,13 @@ public class EnemySpawner : MonoBehaviourPun, IPunObservable
             {
                 GameManager.instance.GetComponent<ItemSpawner>().Spawn(enemy.transform);
             }
+            UIManager.instance.UpdateWaveText(wave, enemyCount);
         };
 
         enemies.Add(enemy);
         enemyCount = enemies.Count;
 
+        UIManager.instance.UpdateWaveText(wave, enemyCount);
     }
 
     IEnumerator CoDestroyAfter(GameObject go , float time)

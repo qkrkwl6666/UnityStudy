@@ -12,6 +12,13 @@ public class PlayerShooter : MonoBehaviourPun {
     private PlayerInput playerInput; // 플레이어의 입력
     private Animator playerAnimator; // 애니메이터 컴포넌트
 
+    [PunRPC]
+    public void AddAmmo(int add)
+    {
+        gun.ammoRemain += add;
+        UpdateUI();
+    }
+
     private void Start() {
         // 사용할 컴포넌트들을 가져오기
         playerInput = GetComponent<PlayerInput>();

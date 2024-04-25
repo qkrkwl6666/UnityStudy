@@ -131,10 +131,13 @@ public class Enemy : LivingEntity
         base.OnDamage(damage, hitPoint, hitNormal);
     }
 
+    [PunRPC]
     // 사망 처리
     public override void Die() 
     {
         // LivingEntity의 Die()를 실행하여 기본 사망 처리 실행
+
+        if (!PhotonNetwork.IsMasterClient) return;
 
         var cols = GetComponentsInChildren<Collider>();
 
@@ -150,14 +153,21 @@ public class Enemy : LivingEntity
         enemyAudioPlayer.PlayOneShot(deathSound);
         base.Die();
 
-        // GameManager.instance.GetComponent<EnemySpawner>().enemies.Remove(this);
-        // 
-        // if(Random.Range(0.0f , 1.0f) > 0.7)
-        // {
-        //     GameManager.instance.GetComponent<ItemSpawner>().Spawn(transform);
-        // }
-        // 
-        // Destroy(gameObject, 10f);
+        GameManager.instance.GetComponent<EnemySpawner>().enemies.Remove(this);
+        
+        if(Random.Range(0.0f , 1.0f) > 0.7)
+        {
+            GameManager.instance.GetComponent<ItemSpawner>().Spawn(transform);
+        }
+
+        StartCoroutine(ZombieDestroy(gameObject, 10f));
+    }
+
+    IEnumerator ZombieDestroy(GameObject item, float time)
+    {
+        yield return new WaitForSeconds(time);
+
+        PhotonNetwork.Destroy(item);
     }
 
     private void OnTriggerStay(Collider other) 

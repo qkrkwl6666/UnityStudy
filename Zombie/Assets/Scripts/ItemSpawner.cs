@@ -71,7 +71,7 @@ public class ItemSpawner : MonoBehaviourPun
 
         // 생성된 아이템을 5초 뒤에 파괴
 
-        StartCoroutine(ItemDestroy(item, 30f));
+        StartCoroutine(ItemDestroy(item, 5f));
     }
 
     IEnumerator ItemDestroy(GameObject item, float time)
@@ -85,8 +85,11 @@ public class ItemSpawner : MonoBehaviourPun
     [PunRPC]
     public void Spawn(Transform transform)
     {
+        Debug.Log("ZombieItemSpawn");
         GameObject selectedItem = items[Random.Range(0, items.Length)];
-        Instantiate(selectedItem, transform.position + Vector3.up * 0.5f, Quaternion.identity);
+        GameObject item = PhotonNetwork.Instantiate(selectedItem.name, transform.position + Vector3.up * 0.5f, Quaternion.identity);
+
+        StartCoroutine(ItemDestroy(item, 5f));
     }
 
 
