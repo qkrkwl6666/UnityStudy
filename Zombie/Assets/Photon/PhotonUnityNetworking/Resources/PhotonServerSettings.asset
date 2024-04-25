@@ -28,23 +28,30 @@ MonoBehaviour:
     AuthMode: 0
     EnableLobbyStatistics: 0
     NetworkLogging: 1
-  DevRegion: kr
+  DevRegion: hk
   PunLogging: 0
   EnableSupportLogger: 0
   RunInBackground: 1
   StartInOfflineMode: 0
   RpcList:
+  - ApplyUpdateHealth
   - ClickRpc
   - DestroyRpc
   - DestroySpaceship
+  - EndGame
   - Fire
-  - RespawnSpaceship
-  - ApplyUpdateHealth
   - OnDamage
+  - OnDie
+  - OnRespawn
+  - RespawnSpaceship
   - RestoreHealth
-  - ShotOnServer
-  - Shot
+  - Setup
   - ShotEffectOnClients
+  - ShotOnServer
+  - Spawn
+  - Use
+  - ServerOnItem
+  - UseItem
   DisableAutoOpenWizard: 1
   ShowSettings: 1
   DevRegionSetOnce: 1

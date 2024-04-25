@@ -1,4 +1,6 @@
-﻿using UnityEngine;
+﻿using Photon.Pun;
+using Unity.Services.Analytics;
+using UnityEngine;
 using UnityEngine.UI; // UI 관련 코드
 
 // 플레이어 캐릭터의 생명체로서의 동작을 담당
@@ -14,6 +16,8 @@ public class PlayerHealth : LivingEntity {
 
     private PlayerMovement playerMovement; // 플레이어 움직임 컴포넌트
     private PlayerShooter playerShooter; // 플레이어 슈터 컴포넌트
+
+    public event System.Action OnRespawn;
 
     private void Awake() 
     {
@@ -38,6 +42,7 @@ public class PlayerHealth : LivingEntity {
         playerShooter.enabled = true;
     }
 
+    [PunRPC]
     // 체력 회복
     public override void RestoreHealth(float newHealth) 
     {
@@ -47,6 +52,7 @@ public class PlayerHealth : LivingEntity {
         healthSlider.value = health;
     }
 
+    [PunRPC]
     // 데미지 처리
     public override void OnDamage(float damage, Vector3 hitPoint, Vector3 hitDirection) 
     {
@@ -61,6 +67,7 @@ public class PlayerHealth : LivingEntity {
 
         playerAudioPlayer.PlayOneShot(hitClip);
     }
+
 
     // 사망 처리
     public override void Die() 
@@ -77,27 +84,68 @@ public class PlayerHealth : LivingEntity {
         playerMovement.enabled = false;
         playerShooter.enabled = false;
 
-        Invoke("Respawn", 5f);
+        //Invoke("Respawn", 5f);
     }
 
     private void OnTriggerEnter(Collider other) 
     {
         // 아이템과 충돌한 경우 해당 아이템을 사용하는 처리
 
-        var item = other.GetComponent<IItem>();
-        if (item != null)
+        if (other.CompareTag("Item"))
         {
-            item.Use(gameObject);
-            playerAudioPlayer.PlayOneShot(itemPickupClip);
+            if (!photonView.IsMine) return;
+
+            var item = other.GetComponent<IItem>();
+
+            if (item != null)
+            {
+                photonView.RPC("ServerOnItem", RpcTarget.MasterClient, photonView.ViewID, other.GetComponent<PhotonView>().ViewID);
+                playerAudioPlayer.PlayOneShot(itemPickupClip);
+            }
         }
+       
+    }
+
+    [PunRPC]
+    private void ServerOnItem(int playerViewId , int itemViewId)
+    {
+        if (!PhotonNetwork.IsMasterClient) return;
+
+        var player = PhotonView.Find(playerViewId).gameObject;
+        var item = PhotonView.Find(itemViewId).gameObject.GetComponent<IItem>();
+
+        if (player != null && item != null)
+        {
+            photonView.RPC("UseItem", RpcTarget.All, playerViewId, itemViewId);
+        }
+    }
+
+    [PunRPC]
+    private void UseItem(int playerViewId , int itemViewId)
+    {
+        var player = PhotonView.Find(playerViewId).gameObject;
+        var item = PhotonView.Find(itemViewId).gameObject.GetComponent<IItem>();
+
+        item.Use(player);
+        
+        if(PhotonNetwork.IsMasterClient)
+        {
+            PhotonNetwork.Destroy(PhotonView.Find(itemViewId).gameObject);
+        }
+
     }
 
     public void Respawn()
     {
+        if(OnRespawn != null)
+        {
+            OnRespawn();
+        }
+
         if (photonView.IsMine)
         {
             // 위치 수정
-
+            photonView.RPC("OnRespawn", RpcTarget.MasterClient, PhotonNetwork.LocalPlayer);
         }
 
         gameObject.SetActive(false);

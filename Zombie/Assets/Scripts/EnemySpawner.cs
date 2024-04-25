@@ -1,8 +1,13 @@
-﻿using System.Collections.Generic;
+﻿using ExitGames.Client.Photon;
+using Photon.Pun;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SocialPlatforms.Impl;
 
 // 적 게임 오브젝트를 주기적으로 생성
-public class EnemySpawner : MonoBehaviour {
+public class EnemySpawner : MonoBehaviourPun, IPunObservable
+{
     public Enemy enemyPrefab; // 생성할 적 AI
 
     public Transform[] spawnPoints; // 적 AI를 소환할 위치들
@@ -19,21 +24,34 @@ public class EnemySpawner : MonoBehaviour {
     public Color strongEnemyColor = Color.red; // 강한 적 AI가 가지게 될 피부색
 
     public List<Enemy> enemies = new List<Enemy>(); // 생성된 적들을 담는 리스트
+
+    private int enemyCount;
     public ZombieData[] zombieDatas;
+
     private int wave; // 현재 웨이브
+
+    private void Awake()
+    {
+        PhotonPeer.RegisterType(typeof(Color), 128, ColorSerialization.SerializeColor,
+            ColorSerialization.DeserializeColor);
+    }
 
     private void Update() 
     {
-        // 게임 오버 상태일때는 생성하지 않음
-        if (GameManager.instance != null && GameManager.instance.isGameover)
-        {
-            return;
-        }
 
-        // 적을 모두 물리친 경우 다음 스폰 실행
-        if (enemies.Count <= 0)
+        if (PhotonNetwork.IsMasterClient)
         {
-            SpawnWave();
+            // 게임 오버 상태일때는 생성하지 않음
+            if (GameManager.instance != null && GameManager.instance.isGameover)
+            {
+                return;
+            }
+
+            // 적을 모두 물리친 경우 다음 스폰 실행
+            if (enemies.Count <= 0)
+            {
+                SpawnWave();
+            }
         }
 
         // UI 갱신
@@ -44,7 +62,7 @@ public class EnemySpawner : MonoBehaviour {
     private void UpdateUI() 
     {
         // 현재 웨이브와 남은 적의 수 표시
-        UIManager.instance.UpdateWaveText(wave, enemies.Count);
+        UIManager.instance.UpdateWaveText(wave, enemyCount);
     }
 
     // 현재 웨이브에 맞춰 적을 생성
@@ -68,25 +86,31 @@ public class EnemySpawner : MonoBehaviour {
             //CreateEnemy(zombieDatas[Random.Range(0, zombieDatas.Length)]);
         }
     }
+
     private void CreateEnemy(ZombieData data)
     {
         int randomNum = Random.Range(0, 4);
 
-        var go = Instantiate(enemyPrefab, spawnPoints[randomNum].transform.position,
+        var go = PhotonNetwork.Instantiate(enemyPrefab.name, spawnPoints[randomNum].transform.position,
                 spawnPoints[randomNum].transform.rotation);
 
-        enemies.Add(go);
+        var enemy = go.GetComponent<Enemy>();
 
-        go.Setup(data);
+        //enemyCount++;
+        enemies.Add(enemy);
 
-        go.onDeath += () =>
+        enemy.photonView.RPC("Setup", RpcTarget.All, data.health, data.damage, data.speed, data.skinColor);
+
+        enemy.onDeath += () =>
         {
-            enemies.Remove(go);
-            Destroy(go.gameObject, 1f);
+            enemyCount = enemies.Count;
+            enemies.Remove(enemy);
+            StartCoroutine(CoDestroyAfter(go, 5f));
+
             GameManager.instance.AddScore(100);
             if (Random.Range(0.0f, 1.0f) > 0.7)
             {
-                GameManager.instance.GetComponent<ItemSpawner>().Spawn(go.transform);
+                GameManager.instance.GetComponent<ItemSpawner>().Spawn(enemy.transform);
             }
         };
     }
@@ -96,26 +120,51 @@ public class EnemySpawner : MonoBehaviour {
     {
         int randomNum = Random.Range(0, 4);
 
-        var go = Instantiate(enemyPrefab, spawnPoints[randomNum].transform.position,
+        var go = PhotonNetwork.Instantiate(enemyPrefab.name, spawnPoints[randomNum].transform.position,
                 spawnPoints[randomNum].transform.rotation);
 
-        enemies.Add(go);
+        var enemy = go.GetComponent<Enemy>();
+        enemy.photonView.RPC("Setup", RpcTarget.All, intensity * healthMax, 
+            intensity * damageMax, intensity * speedMax, intensity > 0.7 ? 
+            strongEnemyColor : Color.white);
 
-        if(intensity == 0.0f)
-            go.Setup(healthMin, damageMin, speedMin, Color.white);
-        else
-            go.Setup(intensity * healthMax, intensity * damageMax, intensity * speedMax, intensity > 0.7 ? strongEnemyColor : Color.white);
-
-        go.onDeath += () =>
+        enemy.onDeath += () =>
         {
-            enemies.Remove(go);
-            Destroy(go.gameObject, 1f);
+            enemyCount = enemies.Count;
+            //enemyCount--;
+            enemies.Remove(enemy);
+            StartCoroutine(CoDestroyAfter(go, 5f));
             GameManager.instance.AddScore(Mathf.FloorToInt(100 + 100 * intensity));
             if (Random.Range(0.0f, 1.0f) > 0.7)
             {
-                GameManager.instance.GetComponent<ItemSpawner>().Spawn(go.transform);
+                GameManager.instance.GetComponent<ItemSpawner>().Spawn(enemy.transform);
             }
         };
 
+        enemies.Add(enemy);
+        enemyCount = enemies.Count;
+
+    }
+
+    IEnumerator CoDestroyAfter(GameObject go , float time)
+    {
+        yield return new WaitForSeconds(time);
+
+        Destroy(go);
+    }
+
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(enemyCount);
+            stream.SendNext(wave);
+        }
+        else
+        {
+            enemyCount = (int)stream.ReceiveNext();
+            wave = (int)stream.ReceiveNext();
+            UIManager.instance.UpdateWaveText(wave, enemyCount);
+        }
     }
 }

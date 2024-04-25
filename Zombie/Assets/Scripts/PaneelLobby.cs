@@ -16,12 +16,18 @@ public class PaneelLobby : MonoBehaviourPunCallbacks
     // Start is called before the first frame update
     private void Start()
     {
-        button.interactable = false;
+        if(!PhotonNetwork.IsConnected)
+        {
+            button.interactable = false;
+            PhotonNetwork.GameVersion = gameVersion;
+            PhotonNetwork.ConnectUsingSettings();
+            message.text = "Connecting to Master Server";
+        }
+        else
+        {
+            button.interactable = false;
+        }
 
-        PhotonNetwork.GameVersion = gameVersion;
-        PhotonNetwork.ConnectUsingSettings();
-
-        message.text = "Connecting to Master Server";
     }
 
     // 연결 시 호출

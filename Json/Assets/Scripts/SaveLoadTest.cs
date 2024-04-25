@@ -18,14 +18,20 @@ public class SaveLoadTest : MonoBehaviour
         // saveDataV1.Gold = int.Parse(inputGold.text);
         // SaveLoadSystem.Save(saveDataV1);
 
-        SaveDataV2 saveDataV2 = new SaveDataV2();
-        saveDataV2.Gold = int.Parse(inputGold.text);
-        saveDataV2.Name = inputName.text;
-        SaveLoadSystem.Save(saveDataV2);
+        // SaveDataV2 saveDataV2 = new SaveDataV2();
+        // saveDataV2.Gold = int.Parse(inputGold.text);
+        // saveDataV2.Name = inputName.text;
+        // SaveLoadSystem.Save(saveDataV2);
 
-        // SaveDataV3 saveDataV3 = new SaveDataV3();
-        // saveDataV3.Gold = int.Parse(inputGold.text);
-        // SaveLoadSystem.Save(saveDataV3);
+        SaveDataV3 saveDataV3 = new SaveDataV3();
+
+        saveDataV3.Rotation = cube.transform.rotation;
+        saveDataV3.Scale = cube.transform.localScale;
+        saveDataV3.Position = cube.transform.position;
+        saveDataV3.color = cube.GetComponent<MeshRenderer>().material.color;
+
+        saveDataV3.Gold = int.Parse(inputGold.text);
+        SaveLoadSystem.Save(saveDataV3);
     }   
     public void Load()
     {

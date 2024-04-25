@@ -7,6 +7,7 @@ using Newtonsoft.Json;
 
 public static class SaveLoadSystem
 {
+
     public enum Mode
     {
         Json,

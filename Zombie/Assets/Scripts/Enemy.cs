@@ -1,9 +1,10 @@
 ﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.AI; // AI, 내비게이션 시스템 관련 코드를 가져오기
+using Photon.Pun;
 
 // 적 AI를 구현한다
-public class Enemy : LivingEntity 
+public class Enemy : LivingEntity
 {
     public LayerMask whatIsTarget; // 추적 대상 레이어
 
@@ -53,6 +54,8 @@ public class Enemy : LivingEntity
     {
         Setup(data.health, data.damage, data.speed, data.skinColor);
     }
+    
+    [PunRPC]
     public void Setup(float newHealth, float newDamage, float newSpeed, Color skinColor) 
     {
         startingHealth = newHealth;
@@ -63,14 +66,20 @@ public class Enemy : LivingEntity
 
     private void Start() 
     {
-        // 게임 오브젝트 활성화와 동시에 AI의 추적 루틴 시작
-        StartCoroutine(UpdatePath());
+        if (PhotonNetwork.IsMasterClient)
+        {
+            // 게임 오브젝트 활성화와 동시에 AI의 추적 루틴 시작
+            StartCoroutine(UpdatePath());
+        }
     }
 
     private void Update() 
     {
-        // 추적 대상의 존재 여부에 따라 다른 애니메이션을 재생
-        enemyAnimator.SetBool("HasTarget", hasTarget);
+        if (PhotonNetwork.IsMasterClient)
+        {
+            // 추적 대상의 존재 여부에 따라 다른 애니메이션을 재생
+            enemyAnimator.SetBool("HasTarget", hasTarget);
+        }
     }
 
     // 주기적으로 추적할 대상의 위치를 찾아 경로를 갱신
@@ -107,6 +116,7 @@ public class Enemy : LivingEntity
         }
     }
 
+    [PunRPC]
     // 데미지를 입었을때 실행할 처리
     public override void OnDamage(float damage, Vector3 hitPoint, Vector3 hitNormal) 
     {
@@ -152,24 +162,27 @@ public class Enemy : LivingEntity
 
     private void OnTriggerStay(Collider other) 
     {
-        // 트리거 충돌한 상대방 게임 오브젝트가 추적 대상이라면 공격 실행   
-        
-        if(!dead && Time.time > lastAttackTime + timeBetAttack)
+
+        if (PhotonNetwork.IsMasterClient)
         {
-            var entity = other.GetComponent<LivingEntity>();
+            // 트리거 충돌한 상대방 게임 오브젝트가 추적 대상이라면 공격 실행   
 
-            if(entity != null && entity == targetEntity)
+            if (!dead && Time.time > lastAttackTime + timeBetAttack)
             {
-                var pos = transform.position;
-                pos.y += 1;
-                var hitPoint = other.ClosestPoint(pos);
-                var hitNomal = other.transform.position - targetEntity.transform.position;
-                entity.OnDamage(damage, hitPoint, hitNomal.normalized);
+                var entity = other.GetComponent<LivingEntity>();
 
-                lastAttackTime = Time.time;
+                if (entity != null && entity == targetEntity)
+                {
+                    var pos = transform.position;
+                    pos.y += 1;
+                    var hitPoint = other.ClosestPoint(pos);
+                    var hitNomal = other.transform.position - targetEntity.transform.position;
+                    entity.OnDamage(damage, hitPoint, hitNomal.normalized);
+
+                    lastAttackTime = Time.time;
+                }
             }
-
-            
         }
+        
     }
 }

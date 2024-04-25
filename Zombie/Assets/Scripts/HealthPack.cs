@@ -1,9 +1,12 @@
-﻿using UnityEngine;
+﻿using Photon.Pun;
+using UnityEngine;
 
 // 체력을 회복하는 아이템
-public class HealthPack : MonoBehaviour, IItem {
+public class HealthPack : MonoBehaviourPun, IItem 
+{
     public float health = 50; // 체력을 회복할 수치
 
+    [PunRPC]
     public void Use(GameObject target) {
         // 전달받은 게임 오브젝트로부터 LivingEntity 컴포넌트 가져오기 시도
         LivingEntity life = target.GetComponent<LivingEntity>();
@@ -15,7 +18,9 @@ public class HealthPack : MonoBehaviour, IItem {
             life.RestoreHealth(health);
         }
 
+
+        //PhotonNetwork.Destroy(gameObject);
         // 사용되었으므로, 자신을 파괴
-        Destroy(gameObject);
+        //Destroy(gameObject);
     }
 }

@@ -1,8 +1,19 @@
-﻿using Photon.Pun;
+﻿using Cinemachine;
+using Photon.Pun;
+using Photon.Realtime;
+using System.Collections.Generic;
+using Unity.AI.Navigation;
 using UnityEngine;
+using UnityEngine.AI;
+using UnityEngine.SceneManagement;
 
 // 점수와 게임 오버 여부를 관리하는 게임 매니저
-public class GameManager : MonoBehaviour {
+public class GameManager : MonoBehaviourPunCallbacks, IPunObservable
+{
+    public static Transform playerTransform;
+
+    public CinemachineVirtualCamera virtualCamera;
+
     // 싱글톤 접근용 프로퍼티
     public static GameManager instance
     {
@@ -25,7 +36,31 @@ public class GameManager : MonoBehaviour {
     private int score = 0; // 현재 게임 점수
     public bool isGameover { get; private set; } // 게임 오버 상태
 
-    private void Awake() {
+    private List<Player> diePlayers = new List<Player>();
+
+    [PunRPC]
+    private void OnDie(Player player)
+    {
+        if (diePlayers.Contains(player)) return;
+
+        diePlayers.Add(player);
+
+        if(diePlayers.Count >= PhotonNetwork.PlayerList.Length)
+        {
+            photonView.RPC("EndGame", RpcTarget.All);
+        }
+    }
+
+    [PunRPC]
+    private void OnRespawn(Player player)
+    {
+        diePlayers.Remove(player);
+
+        photonView.RPC("OnDie", RpcTarget.MasterClient, PhotonNetwork.LocalPlayer);
+    }
+
+    private void Awake() 
+    {
         // 씬에 싱글톤 오브젝트가 된 다른 GameManager 오브젝트가 있다면
         if (instance != this)
         {
@@ -39,7 +74,47 @@ public class GameManager : MonoBehaviour {
         // 플레이어 캐릭터의 사망 이벤트 발생시 게임 오버
         //FindObjectOfType<PlayerHealth>().onDeath += EndGame;
 
-        PhotonNetwork.Instantiate("Woman", Vector3.zero, Quaternion.identity);
+        Vector3 randomPos = transform.position + Random.insideUnitSphere * 10f;
+
+        NavMeshHit hit;
+
+        if(NavMesh.SamplePosition(randomPos, out hit, 100f, NavMesh.AllAreas))
+        {
+            Debug.Log(hit.position);
+        }
+        else
+        {
+            Debug.Log("Nav Mesh Not Found!");
+        }
+
+        var go = PhotonNetwork.Instantiate("Woman", hit.position, Quaternion.identity);
+
+        playerTransform = go.transform;
+
+        virtualCamera.Follow = playerTransform;
+        virtualCamera.LookAt = playerTransform;
+
+        //FindObjectOfType<PlayerHealth>().onDeath += EndGame;
+
+        var playerHealth = go.GetComponent<PlayerHealth>();
+        playerHealth.onDeath += OnPlayerDeath;
+        playerHealth.OnRespawn += () => photonView.RPC("OnRespawn", RpcTarget.MasterClient, PhotonNetwork.LocalPlayer); ;
+        //playerHealth.onDeath += () => photonView.RPC("OnDie", RpcTarget.MasterClient, PhotonNetwork.LocalPlayer); ;
+
+    }
+
+    private void OnPlayerDeath()
+    {
+        // 이 메소드 내에서 RPC 호출을 수행
+        photonView.RPC("OnDie", RpcTarget.MasterClient, PhotonNetwork.LocalPlayer);
+    }
+
+    private void Update()
+    {
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            PhotonNetwork.LeaveRoom();
+        }
     }
 
     // 점수를 추가하고 UI 갱신
@@ -55,6 +130,7 @@ public class GameManager : MonoBehaviour {
         }
     }
 
+    [PunRPC]
     // 게임 오버 처리
     public void EndGame() 
     {
@@ -64,5 +140,22 @@ public class GameManager : MonoBehaviour {
         UIManager.instance.SetActiveGameoverUI(true);
     }
 
-    
+    public void OnPhotonSerializeView(PhotonStream stream, PhotonMessageInfo info)
+    {
+        if (stream.IsWriting)
+        {
+            stream.SendNext(score);
+        }   
+        else
+        {
+            score = (int)stream.ReceiveNext();
+            UIManager.instance.UpdateScoreText(score);
+        }
+    }
+
+    // 방에서 나갔을 때
+    public override void OnLeftRoom()
+    {
+        SceneManager.LoadScene("Lobby");
+    }
 }
