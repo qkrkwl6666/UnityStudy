@@ -11,7 +11,7 @@ public abstract class CreatureInfo : MonoBehaviour
     protected int minHp;
 
     protected bool isDead = false;
-    public abstract void OnDamege(int damage, Vector3 hitPosition);
+    public abstract void OnDamege(int damage, Vector3 hitPosition, Vector3 hitNormal);
     public abstract void Die();
 
 }

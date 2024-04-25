@@ -1,15 +1,17 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
 
 public class Enemy : CreatureInfo
 {
+    public ParticleSystem hitParticle;
     private Transform playerPosition;
     private int startHp;
     private Animator animator;
     private NavMeshAgent navMeshAgent;
-    private Rigidbody rb;
+    private int score = 20;
 
     public override void Die()
     {
@@ -17,8 +19,19 @@ public class Enemy : CreatureInfo
         hp = 0;
         animator.SetTrigger("Death");
 
-        navMeshAgent.enabled = false;
-        
+        if(UIManager.instance != null ) 
+            UIManager.instance.UpdateScore(score);
+
+        StartCoroutine(EnemyActive(false, 5f));
+    }
+
+    IEnumerator EnemyActive(bool active, float time)
+    {
+        yield return new WaitForSeconds(time);
+
+        gameObject.SetActive(active);
+
+        EnemysSpawner.disableEnemies.Remove(this.gameObject);
     }
 
     private void OnEnable()
@@ -34,11 +47,12 @@ public class Enemy : CreatureInfo
         animator = GetComponent<Animator>();
     }
 
-    public override void OnDamege(int damage, Vector3 hitPosition)
+    public override void OnDamege(int damage, Vector3 hitPosition, Vector3 hitNormal)
     {
         hp -= damage;
 
-        Debug.Log("Enemy Hit");
+        hitParticle.transform.forward = hitNormal;
+        hitParticle.Play();
 
         if (hp < 0 && !isDead)
         {
@@ -57,7 +71,9 @@ public class Enemy : CreatureInfo
     // Start is called before the first frame update
     void Start()
     {
-        StartCoroutine(NavMove());
+        gameObject.SetActive(false);
+        // hp = 100;
+        // StartCoroutine(NavMove());
     }
 
     // Update is called once per frame
@@ -72,12 +88,19 @@ public class Enemy : CreatureInfo
             animator.SetBool("isMove", false);
         }
     }
- 
+
+    public void StartSinking()
+    {
+        navMeshAgent.isStopped = true;
+        navMeshAgent.enabled = false;
+    }
+
+
     IEnumerator NavMove()
     {
         while (true)
         {
-            if (!playerPosition && !navMeshAgent.enabled) yield break;
+            if (!playerPosition || !navMeshAgent.isOnNavMesh || !navMeshAgent.enabled) yield break;
 
             navMeshAgent.SetDestination(playerPosition.position);
 

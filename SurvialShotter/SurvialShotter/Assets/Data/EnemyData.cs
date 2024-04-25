@@ -6,7 +6,8 @@ using UnityEngine;
 public class EnemyData : ScriptableObject
 {
     public float percentage;
+    public float speed;
     public int startHp;
     public int damage;
-    public float speed;
+    public int score;
 }

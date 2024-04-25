@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Hellephant
   m_EditorClassIdentifier: 
   percentage: 20
+  speed: 3
   startHp: 400
   damage: 30
-  speed: 3
+  score: 50

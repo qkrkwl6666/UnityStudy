@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: ZomBear
   m_EditorClassIdentifier: 
   percentage: 40
+  speed: 5
   startHp: 200
   damage: 25
-  speed: 5
+  score: 10

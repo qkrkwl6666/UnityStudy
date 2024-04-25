@@ -13,6 +13,7 @@ MonoBehaviour:
   m_Name: Zombunny
   m_EditorClassIdentifier: 
   percentage: 40
+  speed: 7
   startHp: 150
   damage: 15
-  speed: 7
+  score: 10

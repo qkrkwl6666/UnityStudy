@@ -43,7 +43,7 @@ public class Gun : MonoBehaviour
                 {
                     var enemy = hit.collider.gameObject.GetComponent<Enemy>();
 
-                    enemy.OnDamege(damage, hit.point);
+                    enemy.OnDamege(damage, hit.point, hit.normal);
                 }
             }
 

@@ -11,7 +11,7 @@ public class PlayerInfo : CreatureInfo
     private Animator animator;
     private UnityEngine.UI.Slider hpSlider;
 
-    public override void OnDamege(int damage, Vector3 hitPosition)
+    public override void OnDamege(int damage, Vector3 hitPosition, Vector3 hitNormal)
     {
         hp -= damage;
         hpSlider.value = hp;
