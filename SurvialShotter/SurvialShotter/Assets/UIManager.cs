@@ -132,4 +132,15 @@ public class UIManager : MonoBehaviour
             
         yield break;
     }
+
+    public void QuitGameButton()
+    {
+        Application.Quit();
+    }
+
+    public void ResumeButton()
+    {
+        Option.gameObject.SetActive(false);
+        Time.timeScale = 1f;
+    }
 }
