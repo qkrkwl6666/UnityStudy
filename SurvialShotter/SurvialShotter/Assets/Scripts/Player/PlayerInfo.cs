@@ -19,6 +19,8 @@ public class PlayerInfo : CreatureInfo
         hp -= damage;
         hpSlider.value = hp;
 
+        UIManager.instance.PlayerHitEffect();
+
         if (hp < 0 && !isDead)
         {
             Die();

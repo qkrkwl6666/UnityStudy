@@ -61,9 +61,41 @@ public class UIManager : MonoBehaviour
         StartCoroutine(CoGameOver());
     }
 
+    public void PlayerHitEffect()
+    {
+        StartCoroutine(CoPlayerHit());
+    }
+
     IEnumerator CoPlayerHit()
     {
-        yield return null;
+        while(true)
+        {
+            imagePlayerHit.color = Color.clear;
+
+            float hitDuration = 0.2f;
+            float hitTime = 0f;
+
+            while (imagePlayerHit.color.a < 0.3f)
+            {
+                hitTime += Time.deltaTime;
+
+                imagePlayerHit.color = Color.Lerp(new Color(0f, 0f, 0f, 0f),
+                   new Color(1f, 0f, 0f, 0.3f), hitTime / hitDuration * 2f);
+                yield return null;
+            }
+
+            hitTime = 0f;
+
+            while (imagePlayerHit.color.a > 0.0f)
+            {
+                hitTime += Time.deltaTime;
+
+                imagePlayerHit.color = Color.Lerp(new Color(1f, 0f, 0f, 0.3f),
+                   new Color(0f, 0f, 0f, 0.0f), hitTime / hitDuration * 2f);
+                yield return null;
+            }
+            yield break;
+        }
     }
 
     IEnumerator CoGameOver()
