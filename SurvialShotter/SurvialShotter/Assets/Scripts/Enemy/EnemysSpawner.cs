@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
+using static EnemyData;
 
 public class EnemysSpawner : MonoBehaviour
 {
@@ -29,53 +30,36 @@ public class EnemysSpawner : MonoBehaviour
     {
         while (!PlayerInfo.isDead)
         {
-            int index = Random.Range(0, disableEnemies.Count - 1);
+            int randomNum = Random.Range(0, 101);
+            int index = 0;
+    
+            if (randomNum <= 40) index = 0;
+            else if (randomNum <= 80) index = 1;
+            else if (randomNum <= 100) index = 2;
 
+            var go = disableEnemies.Find(enemy => enemy.GetComponent<Enemy>().enemyType == 
+            (EnemyType)index);
+
+            if(go == null)
+            {
+                go = EnemyInstantiate(index, 1);
+            }
             var randomPos = spawnPoint.position + Random.insideUnitSphere * 30f;
             randomPos.y = 0;
             if (NavMesh.SamplePosition(randomPos, out NavMeshHit hit, 50f, 3))
             {
-                if (index < 0 || index >= disableEnemies.Count - 1) continue;
+                go.transform.position = hit.position;
+                go.SetActive(true);
 
-                disableEnemies[index].transform.position = hit.position;
-                disableEnemies[index].SetActive(true);
-
-                enemies.Add(disableEnemies[index]);
-                disableEnemies.RemoveAt(index);
+                enemies.Add(go);
+                disableEnemies.Remove(go);
             }
-            else
-            {
-                Debug.Log("Nav Mesh Not Found!!!");
-            }
-
             yield return new WaitForSeconds(1.5f);
         }
-
-        // enemies.Clear();
-        // disableEnemies.Clear();
+    
     }
 
-    // IEnumerator EnemySpawner()
-    // {
-    //     while (!PlayerInfo.isDead)
-    //     {
-    //         int randomNum = Random.Range(0, 101);
-    //         int index;
-    // 
-    //         if (randomNum <= 40) index = 0;
-    //         else if (randomNum <= 80) index = 1;
-    //         else if (randomNum <= 100) index = 2;
-    // 
-    // 
-    // 
-    //       yield return null;
-    //     }
-    // 
-    // }
-
-
-
-    private void EnemyInstantiate(int index, int count)
+    private GameObject EnemyInstantiate(int index, int count)
     {
         for (int i = 0; i < count; i++)
         {
@@ -83,6 +67,8 @@ public class EnemysSpawner : MonoBehaviour
             go.GetComponent<Enemy>().SetUp(enemyDatas[index]);
             disableEnemies.Add(go);
         }
+
+        return disableEnemies[index];
     }
     private void AddEnemyPrefabs()
     {

@@ -12,6 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5a2d455b906e0546bfaa6b97107ff51, type: 3}
   m_Name: Hellephant
   m_EditorClassIdentifier: 
+  enemyType: 2
   percentage: 100
   speed: 3
   attackSpeed: 1

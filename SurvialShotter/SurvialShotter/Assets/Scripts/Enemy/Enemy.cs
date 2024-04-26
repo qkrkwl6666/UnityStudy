@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
+using static EnemyData;
 
 public class Enemy : CreatureInfo
 {
 
+    public EnemyType enemyType;
     public ParticleSystem hitParticle;
     private Transform playerPosition;
     private int startHp;
@@ -77,6 +79,7 @@ public class Enemy : CreatureInfo
         speed = enemyData.speed;
         score = enemyData.score;
         attackSpeed = enemyData.attackSpeed;
+        enemyType = enemyData.enemyType;
     }
 
     // Start is called before the first frame update
