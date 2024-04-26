@@ -11,7 +11,10 @@ public class Enemy : CreatureInfo
     private int startHp;
     private Animator animator;
     private NavMeshAgent navMeshAgent;
-    private int score = 20;
+    private int score;
+    private float attackSpeed = 3f;
+    private float attackTime;
+    private PlayerInfo playerInfo;
 
     public override void Die()
     {
@@ -36,6 +39,7 @@ public class Enemy : CreatureInfo
 
     private void OnEnable()
     {
+        hp = startHp;
         navMeshAgent.enabled = true;
         StartCoroutine(NavMove());
     }
@@ -43,12 +47,15 @@ public class Enemy : CreatureInfo
     private void Awake()
     {
         playerPosition = GameObject.FindWithTag("Player").transform;
+        playerInfo = playerPosition.gameObject.GetComponent<PlayerInfo>();
         navMeshAgent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
     }
 
     public override void OnDamege(int damage, Vector3 hitPosition, Vector3 hitNormal)
     {
+        if (isDead) return;
+
         hp -= damage;
 
         hitParticle.transform.forward = hitNormal;
@@ -66,12 +73,14 @@ public class Enemy : CreatureInfo
         hp = startHp;
         damage = enemyData.damage;
         speed = enemyData.speed;
+        score = enemyData.score;
     }
 
     // Start is called before the first frame update
     void Start()
     {
         gameObject.SetActive(false);
+        attackTime = Time.time;
         // hp = 100;
         // StartCoroutine(NavMove());
     }
@@ -86,6 +95,13 @@ public class Enemy : CreatureInfo
         else
         {
             animator.SetBool("isMove", false);
+        }
+
+        if(Vector3.Distance(playerPosition.position, transform.position) < 1.5 &&
+            Time.time > attackTime)
+        {
+            playerInfo.OnDamege(damage, Vector3.zero, Vector3.zero);
+            attackTime = Time.time + attackSpeed;
         }
     }
 

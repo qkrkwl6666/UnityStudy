@@ -26,12 +26,17 @@ public class Gun : MonoBehaviour
 
     private void Update()
     {
+        
+    }
+
+    private void FixedUpdate()
+    {
         Shot();
     }
 
     private void Shot()
     {
-        if (Input.GetMouseButtonDown(0))
+        if (Input.GetMouseButton(0))
         {
             Ray ray = new Ray(firePosition.position, firePosition.forward);
 

@@ -9,8 +9,7 @@ public abstract class CreatureInfo : MonoBehaviour
     protected int damage;
     protected float speed;
     protected int minHp;
-
-    protected bool isDead = false;
+    public bool isDead { get; protected set; } = false;
     public abstract void OnDamege(int damage, Vector3 hitPosition, Vector3 hitNormal);
     public abstract void Die();
 

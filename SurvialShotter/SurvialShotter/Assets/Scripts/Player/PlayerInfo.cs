@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using UnityEngine.UIElements;
 
@@ -13,6 +14,8 @@ public class PlayerInfo : CreatureInfo
 
     public override void OnDamege(int damage, Vector3 hitPosition, Vector3 hitNormal)
     {
+        if(isDead) return;
+
         hp -= damage;
         hpSlider.value = hp;
 
@@ -55,6 +58,13 @@ public class PlayerInfo : CreatureInfo
         hp = 0;
         hpSlider.value = 0;
         animator.SetTrigger("Death");
+        UIManager.instance.GameOverUI();
+        //StopCoroutine("EnemySpawner"); 
+    }
+
+    public void RestartLevel()
+    {
+        SceneManager.LoadScene(0 , LoadSceneMode.Single);
     }
 
 

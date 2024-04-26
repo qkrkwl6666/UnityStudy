@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   percentage: 40
   speed: 5
+  attackSpeed: 1
   startHp: 200
   damage: 25
   score: 10
