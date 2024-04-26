@@ -16,6 +16,7 @@ public class EnemysSpawner : MonoBehaviour
     private void Awake()
     {
         AddEnemyPrefabs();
+        //enemyDatas[(int)EnemyType.ZomBear]
     }
     private void Start()
     {
@@ -33,9 +34,9 @@ public class EnemysSpawner : MonoBehaviour
             int randomNum = Random.Range(0, 101);
             int index = 0;
     
-            if (randomNum <= 40) index = 0;
-            else if (randomNum <= 80) index = 1;
-            else if (randomNum <= 100) index = 2;
+            if (randomNum <= enemyDatas[(int)EnemyType.ZomBear].percentage) index = 0;
+            else if (randomNum <= enemyDatas[(int)EnemyType.Zombunny].percentage) index = 1;
+            else if (randomNum <= enemyDatas[(int)EnemyType.Hellephant].percentage) index = 2;
 
             var go = disableEnemies.Find(enemy => enemy.GetComponent<Enemy>().enemyType == 
             (EnemyType)index);
