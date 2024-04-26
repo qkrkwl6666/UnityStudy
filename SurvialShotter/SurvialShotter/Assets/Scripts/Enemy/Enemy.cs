@@ -7,7 +7,6 @@ using static EnemyData;
 
 public class Enemy : CreatureInfo
 {
-
     public EnemyType enemyType;
     public ParticleSystem hitParticle;
     private Transform playerPosition;
@@ -18,6 +17,7 @@ public class Enemy : CreatureInfo
     private float attackSpeed;
     private float attackTime;
     private PlayerInfo playerInfo;
+    private float targetDistance = 2f;
 
     public override void Die()
     {
@@ -37,12 +37,13 @@ public class Enemy : CreatureInfo
 
         gameObject.SetActive(active);
 
-        GameObject.FindWithTag("GameManager").GetComponentInChildren<EnemysSpawner>().disableEnemies.Remove(this.gameObject);
-        //EnemysSpawner.disableEnemies.Remove(this.gameObject);
+        GameObject.FindWithTag("GameManager").GetComponentInChildren<EnemysSpawner>().enemies.Remove(this.gameObject);
+        GameObject.FindWithTag("GameManager").GetComponentInChildren<EnemysSpawner>().disableEnemies.Add(this.gameObject);
     }
 
     private void OnEnable()
     {
+        isDead = false;
         hp = startHp;
         navMeshAgent.enabled = true;
         StartCoroutine(NavMove());
@@ -94,16 +95,9 @@ public class Enemy : CreatureInfo
     // Update is called once per frame
     void Update()
     {
-        if (playerPosition)
-        {
-            animator.SetBool("isMove", true);
-        }
-        else
-        {
-            animator.SetBool("isMove", false);
-        }
+        animator.SetBool("isMove", playerPosition);
 
-        if(Vector3.Distance(playerPosition.position, transform.position) < 2 &&
+        if(Vector3.Distance(playerPosition.position, transform.position) < targetDistance &&
             Time.time > attackTime && !isDead)
         {
             playerInfo.OnDamege(damage, Vector3.zero, Vector3.zero);
@@ -129,4 +123,5 @@ public class Enemy : CreatureInfo
             yield return new WaitForSeconds(0.25f);
         }
     }
+
 }
