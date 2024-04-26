@@ -10,6 +10,7 @@ public class UIManager : MonoBehaviour
 {
     public TMPro.TextMeshProUGUI textScore;
     public TMPro.TextMeshProUGUI textGameOver;
+    public UnityEngine.UI.Image Option;
     public UnityEngine.UI.Image imageGameOverBackground;
     public UnityEngine.UI.Image imagePlayerHit;
     public float backgroundDuration = 1f;
@@ -36,12 +37,31 @@ public class UIManager : MonoBehaviour
     void Start()
     {
         imageGameOverBackground.transform.SetAsFirstSibling();
+        Option.gameObject.SetActive(false);
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        if (Input.GetKeyDown(KeyCode.Escape))
+        {
+            Debug.Log("Option");
+            ShowOptionUI(Option.gameObject.activeSelf ? true : false);
+        }
+    }
+
+    public void ShowOptionUI(bool active)
+    {
+        if (active)
+        {
+            Option.gameObject.SetActive(false);
+            Time.timeScale = 1f;
+        }
+        else
+        {
+            Option.gameObject.SetActive(true);
+            Time.timeScale = 0f;
+        }
     }
 
     public void UpdateScore(int score)
@@ -104,7 +124,7 @@ public class UIManager : MonoBehaviour
         {
             backgroundTime += Time.deltaTime;
 
-            Debug.Log(imageGameOverBackground.color);
+            //Debug.Log(imageGameOverBackground.color);
             imageGameOverBackground.color = Color.Lerp(new Color(0f, 0f, 0f, 0f),
                 new Color(0.1f, 0.1f, 0.1f, 1f), backgroundTime / backgroundDuration * 2f);
 

@@ -12,7 +12,6 @@ public class EnemysSpawner : MonoBehaviour
     public static List<GameObject> disableEnemies = new List<GameObject>();
     private List<GameObject> enemyPrefabs = new List<GameObject>();
     public List<EnemyData> enemyDatas = new List<EnemyData>();
-
     private void Awake()
     {
         AddEnemyPrefabs();
@@ -67,7 +66,6 @@ public class EnemysSpawner : MonoBehaviour
             disableEnemies.Add(go);
         }
     }
-
     private void AddEnemyPrefabs()
     {
         enemyPrefabs.Add(Resources.Load<GameObject>(Defines.ZomBear));

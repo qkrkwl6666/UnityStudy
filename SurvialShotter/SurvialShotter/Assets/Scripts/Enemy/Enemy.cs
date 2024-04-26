@@ -6,13 +6,14 @@ using UnityEngine.AI;
 
 public class Enemy : CreatureInfo
 {
+
     public ParticleSystem hitParticle;
     private Transform playerPosition;
     private int startHp;
     private Animator animator;
     private NavMeshAgent navMeshAgent;
     private int score;
-    private float attackSpeed = 3f;
+    private float attackSpeed;
     private float attackTime;
     private PlayerInfo playerInfo;
 
@@ -34,6 +35,7 @@ public class Enemy : CreatureInfo
 
         gameObject.SetActive(active);
 
+        //GameObject.FindWithTag("GameManager").GetComponentInChildren<EnemysSpawner>().disableEnemies.Remove(this.gameObject);
         EnemysSpawner.disableEnemies.Remove(this.gameObject);
     }
 
@@ -74,6 +76,7 @@ public class Enemy : CreatureInfo
         damage = enemyData.damage;
         speed = enemyData.speed;
         score = enemyData.score;
+        attackSpeed = enemyData.attackSpeed;
     }
 
     // Start is called before the first frame update
