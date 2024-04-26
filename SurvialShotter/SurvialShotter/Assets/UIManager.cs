@@ -45,7 +45,6 @@ public class UIManager : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Escape))
         {
-            Debug.Log("Option");
             ShowOptionUI(Option.gameObject.activeSelf ? true : false);
         }
     }
