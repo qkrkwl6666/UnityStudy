@@ -3109,7 +3109,7 @@ GameObject:
   - component: {fileID: 1502937142}
   m_Layer: 0
   m_Name: GameManager
-  m_TagString: Untagged
+  m_TagString: GameManager
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -4133,6 +4133,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PlayerInfo: {fileID: 1501897575}
   spawnPoint: {fileID: 535738316}
+  enemies: []
+  disableEnemies: []
   enemyDatas:
   - {fileID: 11400000, guid: 60be5aa479a3a86449b4353ef9db9407, type: 2}
   - {fileID: 11400000, guid: b6cba9bdc4db7f34da84303a8f3850d1, type: 2}

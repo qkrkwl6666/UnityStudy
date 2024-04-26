@@ -35,8 +35,8 @@ public class Enemy : CreatureInfo
 
         gameObject.SetActive(active);
 
-        //GameObject.FindWithTag("GameManager").GetComponentInChildren<EnemysSpawner>().disableEnemies.Remove(this.gameObject);
-        EnemysSpawner.disableEnemies.Remove(this.gameObject);
+        GameObject.FindWithTag("GameManager").GetComponentInChildren<EnemysSpawner>().disableEnemies.Remove(this.gameObject);
+        //EnemysSpawner.disableEnemies.Remove(this.gameObject);
     }
 
     private void OnEnable()
@@ -100,8 +100,8 @@ public class Enemy : CreatureInfo
             animator.SetBool("isMove", false);
         }
 
-        if(Vector3.Distance(playerPosition.position, transform.position) < 1.5 &&
-            Time.time > attackTime)
+        if(Vector3.Distance(playerPosition.position, transform.position) < 2 &&
+            Time.time > attackTime && !isDead)
         {
             playerInfo.OnDamege(damage, Vector3.zero, Vector3.zero);
             attackTime = Time.time + attackSpeed;

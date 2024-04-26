@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5a2d455b906e0546bfaa6b97107ff51, type: 3}
   m_Name: Zombunny
   m_EditorClassIdentifier: 
-  percentage: 40
+  percentage: 80
   speed: 7
   attackSpeed: 0.3
   startHp: 150

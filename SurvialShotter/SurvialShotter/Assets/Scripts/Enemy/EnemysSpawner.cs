@@ -8,8 +8,8 @@ public class EnemysSpawner : MonoBehaviour
 {
     public PlayerInfo PlayerInfo;
     public Transform spawnPoint;
-    public static List<GameObject> enemies = new List<GameObject>();
-    public static List<GameObject> disableEnemies = new List<GameObject>();
+    public List<GameObject> enemies = new List<GameObject>();
+    public List<GameObject> disableEnemies = new List<GameObject>();
     private List<GameObject> enemyPrefabs = new List<GameObject>();
     public List<EnemyData> enemyDatas = new List<EnemyData>();
     private void Awake()
@@ -51,8 +51,8 @@ public class EnemysSpawner : MonoBehaviour
             yield return new WaitForSeconds(1.5f);
         }
 
-        enemies.Clear();
-        disableEnemies.Clear();
+        // enemies.Clear();
+        // disableEnemies.Clear();
     }
 
 
