@@ -25,34 +25,52 @@ public class EnemysSpawner : MonoBehaviour
         StartCoroutine(EnemySpawner());
     }
 
+    //IEnumerator EnemySpawner()
+    //{
+    //    while (!PlayerInfo.isDead)
+    //    {
+    //        int index = Random.Range(0, disableEnemies.Count - 1);
+
+    //        var randomPos = spawnPoint.position + Random.insideUnitSphere * 30f;
+    //        randomPos.y = 0;
+    //        if (NavMesh.SamplePosition(randomPos, out NavMeshHit hit, 50f, 3))
+    //        {
+    //            if (index < 0 || index >= disableEnemies.Count - 1) continue;
+
+    //            disableEnemies[index].transform.position = hit.position;
+    //            disableEnemies[index].SetActive(true);
+
+    //            enemies.Add(disableEnemies[index]);
+    //            disableEnemies.RemoveAt(index);
+    //        }
+    //        else
+    //        {
+    //            Debug.Log("Nav Mesh Not Found!!!");
+    //        }
+
+    //        yield return new WaitForSeconds(1.5f);
+    //    }
+
+    //    // enemies.Clear();
+    //    // disableEnemies.Clear();
+    //}
+
     IEnumerator EnemySpawner()
     {
         while (!PlayerInfo.isDead)
         {
-            int index = Random.Range(0, disableEnemies.Count - 1);
+            int randomNum = Random.Range(0, 101);
+            int index;
 
-            var randomPos = spawnPoint.position + Random.insideUnitSphere * 30f;
-            randomPos.y = 0;
-            if (NavMesh.SamplePosition(randomPos, out NavMeshHit hit, 50f, 3))
-            {
-                if (index < 0 || index >= disableEnemies.Count - 1) continue;
+            if (randomNum <= 40) index = 0;
+            else if (randomNum <= 80) index = 1;
+            else if (randomNum <= 100) index = 2;
 
-                disableEnemies[index].transform.position = hit.position;
-                disableEnemies[index].SetActive(true);
 
-                enemies.Add(disableEnemies[index]);
-                disableEnemies.RemoveAt(index);
-            }
-            else
-            {
-                Debug.Log("Nav Mesh Not Found!!!");
-            }
 
-            yield return new WaitForSeconds(1.5f);
+          yield return null;
         }
 
-        // enemies.Clear();
-        // disableEnemies.Clear();
     }
 
 
