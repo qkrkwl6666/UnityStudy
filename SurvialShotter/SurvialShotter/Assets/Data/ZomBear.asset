@@ -12,9 +12,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b5a2d455b906e0546bfaa6b97107ff51, type: 3}
   m_Name: ZomBear
   m_EditorClassIdentifier: 
+  enemyType: 0
   percentage: 40
   speed: 5
-  attackSpeed: 0.5
+  attackSpeed: 1
   startHp: 200
   damage: 25
   score: 10

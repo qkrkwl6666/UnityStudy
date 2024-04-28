@@ -33,6 +33,8 @@ public class PlayerMove : MonoBehaviour
 
     private void FixedUpdate()
     {
+        if(!cinemachineBrain) return;
+
         float x = Input.GetAxisRaw("Horizontal");
         float z = Input.GetAxisRaw("Vertical");
 

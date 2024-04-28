@@ -18,7 +18,7 @@ public class PlayerInfo : CreatureInfo
 
         hp -= damage;
         hpSlider.value = hp;
-
+        PlayerSound.Instance.PlayerHurtSound();
         UIManager.instance.PlayerHitEffect();
 
         if (hp < 0 && !isDead)
@@ -61,7 +61,7 @@ public class PlayerInfo : CreatureInfo
         hpSlider.value = 0;
         animator.SetTrigger("Death");
         UIManager.instance.GameOverUI();
-        //StopCoroutine("EnemySpawner"); 
+        PlayerSound.Instance.PlayerDeathSound();
     }
 
     public void RestartLevel()

@@ -10,6 +10,7 @@ public class EnemyData : ScriptableObject
         ZomBear = 0,
         Zombunny = 1,
         Hellephant = 2,
+        Count = 3,
     }
 
     public EnemyType enemyType;

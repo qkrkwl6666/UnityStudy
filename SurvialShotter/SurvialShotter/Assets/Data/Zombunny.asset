@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: Zombunny
   m_EditorClassIdentifier: 
   enemyType: 1
-  percentage: 80
+  percentage: 99
   speed: 7
-  attackSpeed: 0.3
+  attackSpeed: 0.6
   startHp: 150
   damage: 15
   score: 10

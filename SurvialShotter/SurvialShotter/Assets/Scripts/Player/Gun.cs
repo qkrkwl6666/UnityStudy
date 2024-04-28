@@ -6,10 +6,14 @@ public class Gun : MonoBehaviour
 {
     public ParticleSystem gunParticle;
     public Transform firePosition;
+
+    public float gunTime = 0;
+    public float gunSpeed = 0.2f;
     private int damage = 50;
 
     // ÃÑ¾Ë ±ËÀû
     private LineRenderer lineRenderer;
+
 
     private void Awake()
     {
@@ -21,25 +25,21 @@ public class Gun : MonoBehaviour
 
     private void Start()
     {
-
+        gunTime = -Mathf.Infinity;
     }
 
     private void Update()
-    {
-        
-    }
-
-    private void FixedUpdate()
     {
         Shot();
     }
 
     private void Shot()
     {
-        if (Input.GetMouseButton(0))
+        if (Input.GetMouseButton(0) && Time.time > gunTime)
         {
+            gunTime = gunSpeed + Time.time;
             Ray ray = new Ray(firePosition.position, firePosition.forward);
-
+            PlayerSound.Instance.PlayerGunShotSound();
             if (Physics.Raycast(ray , out RaycastHit hit, 100f))
             {
                 StartCoroutine(ShotEffect(hit.point));

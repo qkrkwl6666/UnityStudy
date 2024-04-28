@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using Unity.VisualScripting;
@@ -19,13 +20,21 @@ public class Enemy : CreatureInfo
     private PlayerInfo playerInfo;
     private float targetDistance = 2f;
 
+    private AudioSource audioSource;
+
+    public AudioClip deathClip;
+    public AudioClip hurtClip;
+    
+    public event Action<Enemy> OnEnemyDie;
+
     public override void Die()
     {
         isDead = true;
         hp = 0;
         animator.SetTrigger("Death");
+        audioSource.PlayOneShot(deathClip);
 
-        if(UIManager.instance != null ) 
+        if (UIManager.instance != null ) 
             UIManager.instance.UpdateScore(score);
 
         StartCoroutine(EnemyActive(false, 5f));
@@ -37,8 +46,7 @@ public class Enemy : CreatureInfo
 
         gameObject.SetActive(active);
 
-        GameObject.FindWithTag("GameManager").GetComponentInChildren<EnemysSpawner>().enemies.Remove(this.gameObject);
-        GameObject.FindWithTag("GameManager").GetComponentInChildren<EnemysSpawner>().disableEnemies.Add(this.gameObject);
+        OnEnemyDie?.Invoke(this);
     }
 
     private void OnEnable()
@@ -46,6 +54,7 @@ public class Enemy : CreatureInfo
         isDead = false;
         hp = startHp;
         navMeshAgent.enabled = true;
+        GetComponent<Collider>().enabled = true;
         StartCoroutine(NavMove());
     }
 
@@ -55,6 +64,7 @@ public class Enemy : CreatureInfo
         playerInfo = playerPosition.gameObject.GetComponent<PlayerInfo>();
         navMeshAgent = GetComponent<NavMeshAgent>();
         animator = GetComponent<Animator>();
+        audioSource = GetComponent<AudioSource>();
     }
 
     public override void OnDamege(int damage, Vector3 hitPosition, Vector3 hitNormal)
@@ -65,6 +75,7 @@ public class Enemy : CreatureInfo
 
         hitParticle.transform.forward = hitNormal;
         hitParticle.Play();
+        audioSource.PlayOneShot(hurtClip);
 
         if (hp < 0 && !isDead)
         {
@@ -86,10 +97,7 @@ public class Enemy : CreatureInfo
     // Start is called before the first frame update
     void Start()
     {
-        gameObject.SetActive(false);
         attackTime = Time.time;
-        // hp = 100;
-        // StartCoroutine(NavMove());
     }
 
     // Update is called once per frame
@@ -107,6 +115,7 @@ public class Enemy : CreatureInfo
 
     public void StartSinking()
     {
+        GetComponent<Collider>().enabled = false;
         navMeshAgent.isStopped = true;
         navMeshAgent.enabled = false;
     }

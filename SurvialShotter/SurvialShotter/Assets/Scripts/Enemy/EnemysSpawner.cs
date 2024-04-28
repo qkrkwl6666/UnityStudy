@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.AI;
@@ -10,19 +11,17 @@ public class EnemysSpawner : MonoBehaviour
     public PlayerInfo PlayerInfo;
     public Transform spawnPoint;
 
-    public List<GameObject> enemies = new List<GameObject>();
-    public List<GameObject> disableEnemies = new List<GameObject>();
-
     private List<GameObject> enemyPrefabs = new List<GameObject>();
     public List<EnemyData> enemyDatas = new List<EnemyData>();
 
-    public SortedSet<Enemy> Enemy = new SortedSet<Enemy>(new EnemyTypeSort());
-    public SortedSet<Enemy> disableEnemys = new SortedSet<Enemy>(new EnemyTypeSort());
+    public Dictionary<EnemyType, List<Enemy>> enemies = new Dictionary<EnemyType, List<Enemy>>();
+    public Dictionary<EnemyType, List<Enemy>> disableEnemies = new Dictionary<EnemyType, List<Enemy>>();
 
     public int spawnCount { get; private set; } = 3;
     private void Awake()
     {
-        AddEnemyPrefabs();
+        InitializeEnemyPrefabs();
+        InitializeEnemyDictionaries();
     }
     private void Start()
     {
@@ -38,63 +37,78 @@ public class EnemysSpawner : MonoBehaviour
         while (!PlayerInfo.isDead)
         {
             int randomNum = Random.Range(0, 101);
-            int index = 0;
-    
-            if (randomNum <= enemyDatas[(int)EnemyType.ZomBear].percentage) index = (int)EnemyType.ZomBear;
-            else if (randomNum <= enemyDatas[(int)EnemyType.Zombunny].percentage) index = (int)EnemyType.Zombunny;
-            else if (randomNum <= enemyDatas[(int)EnemyType.Hellephant].percentage) index = (int)EnemyType.Hellephant;
+            EnemyType index = 0;
 
-            var go = disableEnemies.Find(enemy => enemy.GetComponent<Enemy>().enemyType == 
-            (EnemyType)index);
+            if (randomNum <= enemyDatas[(int)EnemyType.ZomBear].percentage) index = EnemyType.ZomBear;
+            else if (randomNum <= enemyDatas[(int)EnemyType.Zombunny].percentage) index = EnemyType.Zombunny;
+            else if (randomNum <= enemyDatas[(int)EnemyType.Hellephant].percentage) index = EnemyType.Hellephant;
 
-            if (go == null)
+            if(disableEnemies[index] == null) continue;
+
+            var go = disableEnemies[index].FirstOrDefault();
+
+            if (!go)
             {
-                go = EnemyInstantiate(index, 1);
+                go = Instantiate(enemyPrefabs[(int)index], new Vector3(0, 0, 0), Quaternion.identity).GetComponent<Enemy>();
+                go.gameObject.SetActive(false);
+                go.SetUp(enemyDatas[(int)index]);
             }
+            else
+            {
+                disableEnemies[index].RemoveAt(0);
+            }
+
             var randomPos = spawnPoint.position + Random.insideUnitSphere * 30f;
             randomPos.y = 0;
             if (NavMesh.SamplePosition(randomPos, out NavMeshHit hit, 50f, 3))
             {
                 go.transform.position = hit.position;
-                go.SetActive(true);
+                go.gameObject.SetActive(true);
 
-                enemies.Add(go);
-                disableEnemies.Remove(go);
+                enemies[index].Add(go);
+                go.OnEnemyDie += EnemiesDie;
             }
             yield return new WaitForSeconds(1.5f);
         }
     }
 
-    private GameObject EnemyInstantiate(int index, int count)
+    private void EnemyInstantiate(int index, int count)
     {
         for (int i = 0; i < count; i++)
         {
             var go = Instantiate(enemyPrefabs[index], new Vector3(0, 0, 0), Quaternion.identity);
+            go.SetActive(false);
             var enemy = go.GetComponent<Enemy>();
             enemy.SetUp(enemyDatas[index]);
 
-            //Enemy.Add(go.GetComponent<Enemy>());
+            disableEnemies[(EnemyType)index].Add(enemy);
 
-            disableEnemies.Add(go);
+            enemy.OnEnemyDie += EnemiesDie;
         }
-
-        if(!disableEnemies[index]) return null;
-        else return disableEnemies[index];
     }
-    private void AddEnemyPrefabs()
+
+    private void InitializeEnemyPrefabs()
     {
         enemyPrefabs.Add(Resources.Load<GameObject>(Defines.ZomBear));
         enemyPrefabs.Add(Resources.Load<GameObject>(Defines.Zombunny));
         enemyPrefabs.Add(Resources.Load<GameObject>(Defines.Hellephant));
     }
 
-    public class EnemyTypeSort : IComparer<Enemy>
+    private void InitializeEnemyDictionaries()
     {
-        public int Compare(Enemy x, Enemy y)
+        for(int i = 0; i < (int)EnemyData.EnemyType.Count; i++)
         {
-            return x.enemyType.CompareTo(y.enemyType);
+            enemies.Add((EnemyType)i, new List<Enemy>());
+            disableEnemies.Add((EnemyType)i, new List<Enemy>());
         }
     }
 
+    private void EnemiesDie(Enemy enemy)
+    {
+        enemies[enemy.enemyType].Remove(enemy);
+        disableEnemies[enemy.enemyType].Add(enemy);
+
+        enemy.OnEnemyDie -= EnemiesDie;
+    }
 
 }

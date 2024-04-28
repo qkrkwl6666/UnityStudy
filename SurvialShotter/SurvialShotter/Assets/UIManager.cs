@@ -16,9 +16,11 @@ public class UIManager : MonoBehaviour
     public float backgroundDuration = 1f;
     public float backgroundTime = 0f;
 
+    private Coroutine playerHitCo; 
+
     private int score { get; set; }
 
-    private static UIManager m_instance; // ΩÃ±€≈Ê¿Ã «“¥Áµ… ∫Øºˆ
+    private static UIManager m_instance; 
 
     public static UIManager instance
     {
@@ -82,7 +84,10 @@ public class UIManager : MonoBehaviour
 
     public void PlayerHitEffect()
     {
-        StartCoroutine(CoPlayerHit());
+        if(playerHitCo == null)
+        {
+            playerHitCo = StartCoroutine(CoPlayerHit());
+        }
     }
 
     IEnumerator CoPlayerHit()
@@ -113,6 +118,8 @@ public class UIManager : MonoBehaviour
                    new Color(0f, 0f, 0f, 0.0f), hitTime / hitDuration * 2f);
                 yield return null;
             }
+
+            playerHitCo = null;
             yield break;
         }
     }
