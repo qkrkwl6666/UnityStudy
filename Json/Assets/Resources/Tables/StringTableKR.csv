@@ -1,0 +1,13 @@
+﻿Id,String
+HELLO,안녕
+BYE,잘가
+YOU DIE,너 죽음
+TITLE,좀비 서바이벌
+Item1Name,검
+Item2Name,물약
+Item3Name,활
+Item4Name,방패
+Item1Desc,이것은 검
+Item2Desc,이것은 물약
+Item3Desc,이것은 활
+Item4Desc,이것은 방패

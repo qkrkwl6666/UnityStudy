@@ -17,6 +17,8 @@ public class StringTable : DataTable
 
     public override void Load(string path)
     {
+        path = string.Format(FormatPath, path);
+
         table.Clear();
 
         TextAsset testAsset = Resources.Load<TextAsset>(path);

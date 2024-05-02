@@ -119,8 +119,6 @@ public class Enemy : CreatureInfo
         navMeshAgent.isStopped = true;
         navMeshAgent.enabled = false;
     }
-
-
     IEnumerator NavMove()
     {
         while (true)

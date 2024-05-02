@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 
 public static class DataTableMgr
@@ -19,6 +20,16 @@ public static class DataTableMgr
         DataTable table3 = new StringTable();
         table3.Load(DataTablesIds.String[(int)Languages.JAPANESE]);
         tables.Add(DataTablesIds.String[(int)Languages.JAPANESE], table3);
+
+        ItemTable itemTable = new ItemTable();
+
+        itemTable.Load(DataTablesIds.Item);
+        tables.Add(DataTablesIds.Item, itemTable);
+    }
+
+    public static StringTable GetStringTable()
+    {
+        return Get<StringTable>(DataTablesIds.String[(int)Vars.currentLanguages]);
     }
 
     public static T Get<T>(string id) where T : DataTable

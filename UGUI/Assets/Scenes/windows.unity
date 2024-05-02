@@ -1106,7 +1106,7 @@ MonoBehaviour:
   - {fileID: 343511442}
   - {fileID: 532785502}
   - {fileID: 1325633449}
-  defaultWindowId: 2
+  defaultWindowId: 0
 --- !u!1001 &274157211
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2669,6 +2669,7 @@ MonoBehaviour:
   firstSeleted: {fileID: 274157213}
   isActive: 1
   textMeshProUGUI: {fileID: 207497536}
+  stringCount: 10
 --- !u!1001 &582680753
 PrefabInstance:
   m_ObjectHideFlags: 0

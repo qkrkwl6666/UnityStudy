@@ -21,7 +21,7 @@ public class GameOver : GernericWindow
 
     protected void Start()
     {
-        // Open();
+        Open();
     }
 
     public override void Open()
