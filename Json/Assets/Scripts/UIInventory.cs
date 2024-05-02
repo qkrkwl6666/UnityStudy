@@ -123,16 +123,19 @@ public class UIInventory : MonoBehaviour
         Destroy(slots[removeIndex].gameObject);
         slots.RemoveAt(removeIndex);
 
+        Debug.Log(currentSlotCount);
+
         currentSlotCount--;
         removeIndex = -1;
 
         slots.Add(Instantiate(inventorySlot, content.transform));
         slots[slots.Count - 1].SetEmpty();
+        slots[slots.Count - 1].slotIndex = maxSlotCount - 1;
     }
 
     public void EventRemoveIndex(int index , ItemData data)
     {
-        Debug.Log(index);
+        //Debug.Log(index);
 
         removeIndex = index;
 
