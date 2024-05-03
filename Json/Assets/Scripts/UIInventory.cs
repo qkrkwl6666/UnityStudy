@@ -4,12 +4,17 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using System;
+using System.Linq;
 
 public class UIInventory : MonoBehaviour
 {
     public int currentSlotCount = 0;
     public int maxSlotCount = 30;
+
     public List<UIItemSlot> slots = new List<UIItemSlot>();
+
+    public List<ItemData> itemDataList = new List<ItemData>(); // 원본 세이브 로드
+    public List<ItemData> inventoryItemDataList = new List<ItemData>(); // 정렬 + 필터링
 
     public static int removeIndex = -1;
     public Image currentImage;
@@ -36,6 +41,9 @@ public class UIInventory : MonoBehaviour
         "소모품",
     };
 
+    private int sortingOption;
+    private int filteringOption;
+
     public UIItemSlot inventorySlot;
     public GameObject content;
 
@@ -46,6 +54,74 @@ public class UIInventory : MonoBehaviour
     public Button removeButton;
 
     ItemTable itemTable;
+
+    private void UpdateItemSlots()
+    {
+        // 필터링 + 정렬
+        inventoryItemDataList = itemDataList;
+
+        switch (filteringOption)
+        {
+            case 0:
+                break;
+            case 1:
+                inventoryItemDataList = inventoryItemDataList
+                    .Where(data => data.Type == "Weapon")
+                    .ToList();
+                break;
+            case 2:
+                inventoryItemDataList = inventoryItemDataList
+                    .Where(data => data.Type == "Equip")
+                    .ToList();
+                break;
+            case 3:
+                inventoryItemDataList = inventoryItemDataList
+                    .Where(data => data.Type == "Consumable")
+                    .ToList();
+                break;
+        }
+
+        switch (sortingOption)
+        {
+            case 0:
+                break;
+            case 1:
+                inventoryItemDataList = inventoryItemDataList
+                    .OrderBy(data => data.GetName)
+                    .ToList();
+                break;
+            case 2:
+                inventoryItemDataList = inventoryItemDataList
+                    .OrderByDescending(data => data.GetName)
+                    .ToList();
+                break;
+            case 3:
+                inventoryItemDataList = inventoryItemDataList
+                    .OrderBy(data => data.Cost)
+                    .ToList();
+                break;
+            case 4:
+                inventoryItemDataList = inventoryItemDataList
+                    .OrderByDescending(data => data.Cost)
+                    .ToList();
+                break;
+        }
+
+
+
+        for (int i = 0; i < slots.Count; i++)
+        {
+            if (i < inventoryItemDataList.Count)
+            {
+                slots[i].SetData(inventoryItemDataList[i]);
+            }
+            else
+            {
+                slots[i].SetEmpty();
+            }
+
+        }
+    }
 
     private void Awake()
     {
@@ -60,6 +136,7 @@ public class UIInventory : MonoBehaviour
 
         sorting.value = 0;
         sorting.RefreshShownValue();
+        sortingOption = 0;
         filtering.options.Clear();
 
         foreach (var optin in filteringOptions)
@@ -68,6 +145,7 @@ public class UIInventory : MonoBehaviour
         }
 
         filtering.value = 0;
+        filteringOption = 0;
         filtering.RefreshShownValue();
     }
 
@@ -92,13 +170,18 @@ public class UIInventory : MonoBehaviour
 
     public void OnValueChangeSorting(int value)
     {
-        Debug.Log(sortingOptions[value]);
+        sortingOption = value;
+
+        UpdateItemSlots();
     }
 
     public void OnValueChangeFiltering(int value)
     {
-        Debug.Log(filteringOptions[value]);
+        filteringOption = value;
+        UpdateItemSlots();
     }
+
+
 
     public void OnClickItemAdd()
     {
@@ -106,7 +189,10 @@ public class UIInventory : MonoBehaviour
 
         if (currentSlotCount < maxSlotCount)
         {
-            slots[currentSlotCount++].SetData(itemTable.Get("Item" + RandomItem));
+            itemDataList.Add(itemTable.Get("Item" + RandomItem));
+            UpdateItemSlots();
+            currentSlotCount++;
+            //slots[currentSlotCount++].SetData();
         }
 
     }
@@ -115,22 +201,26 @@ public class UIInventory : MonoBehaviour
     {
         if (removeIndex == -1) return;
 
-        for(int i = removeIndex + 1; i < slots.Count; i++)
-        {
-            slots[i].slotIndex--;
-        }
-
-        Destroy(slots[removeIndex].gameObject);
-        slots.RemoveAt(removeIndex);
-
-        Debug.Log(currentSlotCount);
+        itemDataList.RemoveAt(itemDataList.Count - 1);
+        UpdateItemSlots();
 
         currentSlotCount--;
         removeIndex = -1;
 
-        slots.Add(Instantiate(inventorySlot, content.transform));
-        slots[slots.Count - 1].SetEmpty();
-        slots[slots.Count - 1].slotIndex = maxSlotCount - 1;
+        // for(int i = removeIndex + 1; i < slots.Count; i++)
+        // {
+        //     slots[i].slotIndex--;
+        // }
+        // 
+        // var go = slots[removeIndex];
+        // slots[removeIndex].gameObject.transform.SetAsLastSibling();
+        // slots.RemoveAt(removeIndex);
+        // slots.Add(go);
+        // 
+        // currentSlotCount--;
+        // removeIndex = -1;
+        // slots[maxSlotCount - 1].SetEmpty();
+        // slots[maxSlotCount - 1].slotIndex = maxSlotCount - 1;
     }
 
     public void EventRemoveIndex(int index , ItemData data)
@@ -147,4 +237,8 @@ public class UIInventory : MonoBehaviour
         currentValueText.text = data.Value.ToString();
         currentTypeText.text = data.Type.ToString();
     }
+
+    //public class 
+
+
 }

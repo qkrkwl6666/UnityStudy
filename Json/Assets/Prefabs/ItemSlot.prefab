@@ -167,7 +167,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   itemIcon: {fileID: 9075558025365901666}
-  nullIcon: {fileID: 9075558025365901666}
+  nullIcon: {fileID: 21300000, guid: 9642d91ab3889ed48ac1840be621688c, type: 3}
   itemName: {fileID: 5397439652975212712}
 --- !u!114 &6402527436722183111
 MonoBehaviour:
